@@ -1,0 +1,31 @@
+From 5d485abe8f5b2944e0a964b250cf8b25c081154a Mon Sep 17 00:00:00 2001
+From: Juan Palomino <jpalomino09@gmail.com>
+Date: Tue, 27 Oct 2026 15:19:00 -0700
+Subject: [PATCH] web: new documents save as .ai by default
+
+Hosted web fork (j-palomino.github.io/vectorcraft-web): DocState's starting
+save format is "ai" on wasm32; desktop builds keep "vectorcraft".
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ crates/engine/src/lib.rs | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/crates/engine/src/lib.rs b/crates/engine/src/lib.rs
+index 3ccedb7..6ad4339 100644
+--- a/crates/engine/src/lib.rs
++++ b/crates/engine/src/lib.rs
+@@ -570,7 +570,9 @@ impl DocState {
+             uid: NEXT_DOC_UID.fetch_add(1, std::sync::atomic::Ordering::Relaxed),
+             mask_view: None,
+             transparency_grid,
+-            format: "vectorcraft",
++            // Hosted web fork: new documents save as Illustrator `.ai` (PDF-compatible) by default;
++            // desktop builds keep the native format.
++            format: if cfg!(target_arch = "wasm32") { "ai" } else { "vectorcraft" },
+             save_options: Default::default(),
+             save_artboards: vec![],
+             converted: false,
+-- 
+2.54.0
+
